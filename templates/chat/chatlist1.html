@@ -1,0 +1,21 @@
+<html>
+<header>
+  <h1>{{ .title }}</h1>
+</header>
+<body>
+  <hr/>
+  <ol>
+    {{ range .rooms }}
+      <p>
+       <li><a href="/chat/chat?id={{ .ID }}">{{ .RoomName}}</a>
+       </li>
+      </p>
+       <!-- <a href="URL">ここをクリック</a> -->
+    {{end}}
+  </ol>
+  <br/>
+  <form role="form" action="/logout" method="POST">
+    <button class="btn btn-lg btn-primary pull-right" type="submit">ログアウト</button>
+  </form>
+</body>
+</html>

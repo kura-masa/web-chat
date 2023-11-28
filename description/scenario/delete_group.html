@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グループを消す</title>
+  <style>
+    img {
+      max-width: 50%;
+      height: auto;
+    }
+  </style>
+  <script>
+    // ページ読み込み時にローカルストレージからメニューの状態を復元
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuItems = document.querySelectorAll(".menu-item details");
+
+      menuItems.forEach(function(menuItem) {
+        const key = "menu_" + menuItem.querySelector("summary").textContent;
+        const isMenuOpen = localStorage.getItem(key);
+
+        if (isMenuOpen === "true") {
+          menuItem.setAttribute("open", "true");
+        } else {
+          menuItem.removeAttribute("open");
+        }
+
+        menuItem.addEventListener("toggle", function() {
+          localStorage.setItem(key, menuItem.hasAttribute("open"));
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>グループを消す</h1>
+  <h2>目的: TaroがJiroとSaburoとのグループを消す</h2>
+  <div class="menu-item">
+    <img src="https://github.com/kura-masa/src/blob/main/home.png?raw=true">
+    <iframe src="https://github.com/kura-masa/src/blob/main/3%3A23.mp4" width="600" height="400"></iframe>
+    <details>
+      <summary>方法</summary>
+      <ol>
+        <li>
+          <p>Taroがログインする</p>
+        </li>
+        <li>
+          <div class="menu-item">
+            <details>
+              <summary>グループリストを表示して、TaroJiroSaburoというグループの削除ボタンを押す。</summary>
+              <ol>
+                <li>
+                  <p>削除ボタンが押されると、HTMLのformが発火し、ルーム名と共にPOSTリクエストがサーバーに送られる。<a href="/html/form_description">formの説明</a></p>
+                </li>
+                <li>
+                  <p>ハンドラ関数RequireAuthが発火し、続けてDeleteGroupが発火する</p>
+                </li>
+                <ol>
+                  <li>
+                    <div class="menu-item">
+                      <details>
+                        <summary>DeleteGroup関数</summary>
+                        <pre>
+                          <code>
+func DeleteGroup(c *gin.Context) {
+  room_id := c.PostForm("room_id")
+  result := initializers.DB.Debug().
+    Where("id = ?", room_id).Delete(&models.Rooms{})
+  if result.Error != nil {
+    c.HTML(http.StatusOK, "home.html", gin.H{
+      "title": "エラーが発生しました",
+    })
+    return
+  }
+  result = initializers.DB.Debug().
+    Where("rooms_refer = ?", room_id).Delete(&[]models.Groups{})
+  if result.Error != nil {
+    c.HTML(http.StatusOK, "home.html", gin.H{
+      "title": "エラーが発生しました",
+    })
+    return
+  }
+  c.Redirect(http.StatusSeeOther, "/home")
+}
+                          </code>
+                        </pre>
+                      </details>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="menu-item">
+                      <details>
+                        <summary>コードの説明</summary>
+                        <ol>
+                          <li>c.PostForm("room_id")で、formからroomIDを受け取る。</li>
+                          <li>Where("id = ?", room_id).Delete(&models.Rooms{})で、該当するルームIDの情報を削除する(<a href="/logical_physical_deletion">論理削除</a>)(<a href="/go/gorm_description">詳しい説明</a>)</li>
+                          <li>Where("rooms_refer = ?", room_id).Delete(&[]models.Groups{})で、該当するルームIDのgroupsテーブルの情報を削除する(<a href="/logical_physical_deletion">論理削除</a>)</li>
+                          <li>HOMEにリダイレクトする</li>
+                        </ol>
+                      </details>
+                    </div>
+                  </li>
+                </ol>
+              </ol>
+            </details>
+          </div>
+        </li>
+      </ol>
+    </details>
+  </div>
+  <hr />
+  <footer>
+    <a href="/html_lists">HTMLの説明リストに戻る</a><br>
+    <a href="/back2auth">最初に戻る</a>
+  </footer>
+</body>
+</html>

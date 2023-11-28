@@ -1,0 +1,112 @@
+<html>
+<header>
+  <h1>{{ .title }}</h1>
+</header>
+<script type="text/javascript">
+  window.onload = function () {
+      var conn;
+      var content = document.getElementById("content");
+      var room_id = document.getElementById("room_id");
+      var log = document.getElementById("log");
+      
+      const baseURL = "http://localhost:3001";
+  
+      function appendLog(item) {
+          var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
+          log.appendChild(item);
+          if (doScroll) {
+              log.scrollTop = log.scrollHeight - log.clientHeight;
+          }
+      }
+
+      document.getElementById("form").onsubmit = function () {
+          if (!conn) {
+              return false;
+          }
+          if (!content.value) {
+              return false;
+          }
+          conn.send(content.value);
+
+          const data = {
+            content: content.value,
+            room_id: parseInt(room_id.value,10)
+          }
+          const body = encodeURI(`content=${content.value}`);
+        fetch(`${baseURL}/chat/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        })
+        .then(response => {
+          if (!response.ok) {
+            document.getElementById("status").innerHTML =
+              `<div class='alert alert-warning'>
+                ${response.status} : ${response.statusText}
+              </div>`;
+            return response.json();
+          }
+          console.log("レスポンスが帰ってきたよ")
+        });
+          content.value = "";
+          return false;
+      };
+  
+      if (window["WebSocket"]) {
+          conn = new WebSocket("ws://" + document.location.host + `/ws/${room_id.value}`);
+          conn.onclose = function (evt) {
+              var item = document.createElement("div");
+              item.innerHTML = "<b>Connection closed.</b>";
+              appendLog(item);
+          };
+          conn.onmessage = function (evt) {
+              var messages = evt.data.split('\n');
+              for (var i = 0; i < messages.length; i++) {
+                  var item = document.createElement("div");
+                  item.innerText = messages[i];
+                  appendLog(item);
+              }
+          };
+      } else {
+          var item = document.createElement("div");
+          item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
+          appendLog(item);
+      }
+  };
+  </script>
+<body>
+  <hr/>
+    {{ range .chat_history }}
+      <p>
+       {{.Content}}
+      </p>
+    {{end}}
+  <br/>
+  <div id="log"></div>
+    <form id="form">
+    <!-- idを表示させずに送ることができる (type="hidden") -->
+    <input type="hidden" name="room_id" id="room_id" value="{{.room.ID}}" /> 
+    <div class="form-group" id="form">
+      <textarea class="form-control" name="content" id="content" placeholder="chat" rows="2"></textarea>
+      <input class="btn btn-lg btn-primary pull-right" type="submit">送信</button>
+    </div>
+    </form>
+    <div id="status" role="alert"></div>
+  <!-- 
+  <form role="form" action="/chat/create" method="POST">
+    idを表示させずに送ることができる (type="hidden")
+    <input type="hidden" name="room_id" value="{{.room.ID}}" />
+
+    <div class="form-group" id="form">
+      <textarea class="form-control" name="content" id="content" placeholder="chat" rows="2"></textarea>
+      <input class="btn btn-lg btn-primary pull-right" type="submit">送信</button>
+    </div>
+  </form> -->
+  <br/>
+  <form role="form" action="/chat/chatlist" method="GET">
+    <button class="btn btn-lg btn-primary pull-right" type="submit">戻る</button>
+  </form>
+</body>
+</html>

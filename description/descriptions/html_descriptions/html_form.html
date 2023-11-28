@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMLのformの説明</title>
+    <style>
+        ul {
+            list-style: none;
+        }
+    </style>
+</head>
+   
+<body>
+    <h1>HTMLのformの説明</h1>
+    <pre>
+        <code>
+      1 &lt;form role="form" action="/home/search_friend" method="POST"&gt;
+      2  &lt;div class="form-group"&gt;
+      3         &lt;input type="text" name="searchBar" id="searchBar" placeholder="検索バー"&gt;
+      4         &lt;button class="btn btn-lg btn-primary pull-right" type="submit"&gt;検索&lt;/button&gt;
+      5     &lt;/div&gt;
+      6 &lt;/form&gt;
+        </code>
+    </pre>
+    <ul>
+        <li>送信ボタンを押すと、form が発火する</li>
+        <li>action には、サーバーにデータを送信する際のパスを書く</li>
+        <li>method には、データの送信方法を書く。主に、GET と POST がある。</li>
+        <li>3 行目で、ユーザーが入れた情報を name=”名前”で名前を指定してサーバーに送れる。</li>
+        <li>GET はデータを URL に含めて送信し、サーバーからのデータの取得が主である。URL にデータを含めるので、見られても良い情報に限った方が良い。</li>
+        <li>POST はデータをリクエストボディに含めて送信し、サーバーにデータを送信するのが主である</li>
+    </ul>
+</body>
+<footer>
+<a href="/html_lists">HTMLの説明リストに戻る</a><br>
+<a href="/back2auth">最初に戻る</a>
+</footer>
+</html>
