@@ -1,0 +1,22 @@
+<html>
+<header>
+  <h1>{{ .title }}</h1>
+</header>
+<body>
+  <form role="form" action="/todos/update" method="POST">
+    <!-- idを表示させずに送ることができる (type="hidden") -->
+  <input type="hidden" name="id" value="{{.todo.ID}}" />
+    <div class="lead">Todos更新</div>
+    <div class="form-group">
+      <textarea class="form-control" name="content" id="content" placeholder="Todoを追加" rows="4">{{.todo.Content}}</textarea>
+      <br/>
+      <br/>
+      <button class="btn btn-lg btn-primary pull-right" type="submit">更新</button>
+    </div>
+  </form>
+  <hr/>
+  <a href="/todos/list">
+    <button>戻る</button>
+  </a>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ1</title>
+</head>
+<body>
+    <h1>シナリオ</h1>
+    <h2>目的:TaroがJiroと友達になる</h2>
+    <details>
+    <summary>方法</summary>
+    <ol>
+        <li><p>Taroが新規登録し、ログインする</p></li>
+        <li><details>
+        <summary>検索バーにJiroと入力し検索ボタンを押す</summary>
+        <a>HTMLのformの説明</a>
+        <ol>
+        <li><p>formタグ内にある検索ボタンが押されると、サーバーにリクエストが送られる</p></li>
+        <li><p>actionで指定したパスに該当するハンドラ関数が実行される</p></li>
+<pre>
+    <code>
+＜main.go＞
+r.POST("/home/search_friend", middleware.RequireAuth, controllers.SearchFriend)
+    </code>
+</pre>
+        <li><p>その際、methodで指定した形式でリクエストが送られる(この場合はPOSTリクエスト)</p></li>
+        </ol>
+<pre>
+    <code>
+このコードは、templates/home/home.htmlの中にある
+    &lt;form role="form" action="/home/search_friend" method="POST"&gt;
+    &lt;div class="form-group"&gt;
+        &lt;input type="text" name="searchBar" id="searchBar" placeholder="検索バー"&gt;
+        &lt;button class="btn btn-lg btn-primary pull-right" type="submit"&gt;検索&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;/form&gt;
+    </code>
+</pre>
+
+        
+        
+        </details></li>
+        <li><p>追加ボタンを押す</p></li>
+        <li><p>フレンドリストを開く</p></li>
+    </ol>
+    </details>
+<hr/>
+    
+</body>
+<footer>
+</footer>
+</html>

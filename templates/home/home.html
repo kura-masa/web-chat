@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>モバイルページ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .container {
+            max-width: 320px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .list {
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .search-result {
+            display: none;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .search-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .delete-button {
+            width: 30%; /* 削除ボタンの横幅を100%に設定 */
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{.title}}</h1>
+    </header>
+    <div class="container">
+        <form role="form" action="/home/search_friend" method="POST">
+            <div class="form-group">
+              <input type="text" name="searchBar" id="searchBar" placeholder="検索バー">
+              <button class="btn btn-lg btn-primary pull-right" type="submit">検索</button>
+            </div>
+        </form>
+        <button id="showFriendList">フレンドリスト</button>
+        <div class="list" id="friendList">
+        <input type="text" name="group_name" id="group_name" placeholder="グループ名を入力してください">
+        <button id="createGroup">グループ作成</button>
+        {{ range .users }}  
+            <p>
+            <form role="form" action="/home/destroy_friend" method="POST">
+                <input type="hidden" name="dfriend" value="{{.UserName}}">
+                <input type="hidden" name="userid" value="{{.ID}}">
+                <li><input type="checkbox" name="friend"value={{.ID}}><a>{{ .UserName }}</a></li>
+                <a><button class="delete-button">削除</button></a>
+            </form>
+            </p>
+        {{end}} 
+        </div>
+        <button id="showGroupList">グループリスト</button>
+        <div class="list" id="groupList">
+        {{ range .rooms }}  
+            <p>
+            <form role="form" action="/home/destroy_group" method="POST">
+                <!-- <input type="hidden" name="room" value="{{.RoomName}}"> -->
+                <input type="hidden" name="room_id" value="{{.ID}}">
+                <li><a>{{ .RoomName }}</a></li>
+                <a><button class="delete-button">削除</button></a>
+            </form>
+            </p>
+        {{end}} 
+        </div>
+        <form role="form" action="/logout" method="POST">
+            <button>ログアウト</button>
+        </form>
+    </div>
+    <script>
+        const searchButton = document.getElementById('searchButton');
+        const searchBar = document.getElementById('searchBar');
+        const showFriendListButton = document.getElementById('showFriendList');
+        const friendList = document.getElementById('friendList');
+        const showGroupListButton = document.getElementById('showGroupList');
+        const groupList = document.getElementById('groupList');
+        const createGroupButton = document.getElementById('createGroup');
+        const groupNameBar = document.getElementById('group_name');
+        const friendCheckboxes = document.querySelectorAll('input[name="friend"]');
+
+        showFriendListButton.addEventListener('click', () => {
+            toggleListVisibility(friendList);
+        });
+
+        showGroupListButton.addEventListener('click', () => {
+            toggleListVisibility(groupList);
+        });
+
+        function toggleListVisibility(listElement) {
+            if (listElement.style.display === 'none') {
+                listElement.style.display = 'block';
+            } else {
+                listElement.style.display = 'none';
+            }
+        }
+        
+  
+        
+        createGroupButton.addEventListener('click', () => {
+            // グループ作成ボタンをクリックしたときの処理
+            const groupNameValue = groupNameBar.value.trim();
+            if (groupNameValue === '') {
+                alert('グループ名を入力してください。');
+                return; // グループ名が入力されていない場合はフォームを提出しない
+            }
+
+            const selectedFriends = Array.from(friendCheckboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+            
+            const data = {
+                groupName: groupNameBar.value,
+                selectedFriends: selectedFriends
+            }
+            
+            // サーバーにデータを送信
+            fetch('/home/create_group', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                if (response.ok) {
+                    // サーバーからの応答が成功の場合の処理
+                    console.log('グループが作成されました。');
+                    location.reload();
+                    // ここで適切な応答処理を行うか、リダイレクトなどを行います。
+                } else {
+                    // サーバーからの応答がエラーの場合の処理
+                    console.error('グループの作成に失敗しました。');
+                    window.location.href = "/error";
+                }
+            })
+            .catch(error => {
+                // エラーが発生した場合の処理
+                console.error('エラーが発生しました。', error);
+            });
+        });
+    </script>
+</body>
+<!-- FontAwesome CSSを追加 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Homeとチャットのアイコンを追加 -->
+<footer>
+    <a href="/home">
+        <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/chat/chatlist">
+        <i class="fas fa-comments"></i> チャット
+    </a>
+</footer>
+
+</html>
+
+<!-- ログアウトの挙動を忘れず追加する -->
+<!-- {{.title}}を<h1>に入れるのを忘れない -->
+    <!-- 検索ボタンの挙動 -->
+

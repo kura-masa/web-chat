@@ -1,0 +1,42 @@
+<html>
+<header>
+  <h1>{{ .title }}</h1>
+</header>
+<body>
+  <!-- chatリスト表示(2023/09/19) -->
+  <hr/>
+  <ol>
+    {{ range .room1 }}
+      <p>
+       <li><a href="/chat/chat?id={{ .ID }}">{{.RoomName }}</a></li>
+      </p> 
+    {{end}}
+  </ol>
+  <!-- <br/> -->
+  <!-- groupリスト表示(2023/09/20) -->
+  <hr/>
+  <ol>
+    {{ range .room2 }}
+      <p>
+       <li><a href="/chat/chat?id={{ .ID }}">{{.RoomName}}</a></li>
+      </p> 
+    {{end}}
+  </ol>
+  <br/>
+  <form role="form" action="/logout" method="POST">
+    <button class="btn btn-lg btn-primary pull-right" type="submit">ログアウト</button>
+  </form>
+</body>
+<!-- FontAwesome CSSを追加 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Homeとチャットのアイコンを追加 -->
+<footer>
+    <a href="/home">
+        <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/chat/chatlist">
+        <i class="fas fa-comments"></i> チャット
+    </a>
+</footer>
+</html>
