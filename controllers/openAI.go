@@ -32,20 +32,28 @@ func OpenAIContextTranslate(c *gin.Context) {
 			break
 		}
 		if u1 == chat.UserID {
-			question += "A:" + chat.Content + " "
+			question = "A:" + chat.Content + question
 		} else {
-			question += "B:" + chat.Content + " "
+			question = "B:" + chat.Content + question
 		}
 	}
-	question += "一つ目の文章を文脈を考慮して、主語・述語・目的語がある日本語に翻訳して。"
+	question += chat_history[0].Content + "の目的語が無い場合補完した英文のみを出力して"
 
 	println("AIに送った質問の内容")
 	println(question)
 	apiResponse, err := queryOpenAI(question)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying OpenAI"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying OpenAI 1"})
 		return
 	}
+
+	question = apiResponse + "日本語訳して"
+	apiResponse, err = queryOpenAI(question)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying OpenAI 2"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"data": apiResponse})
 }
 
@@ -62,12 +70,12 @@ func queryOpenAI(question string) (string, error) {
 	// OpenAIにリクエストを送信
 	requestData := map[string]interface{}{
 		"messages": []map[string]string{
-			{"role": "system", "content": ""},
 			{"role": "user", "content": question},
 		},
-		"max_tokens": 200,
-		"model":      "gpt-3.5-turbo",
+		"max_tokens": 50,
+		"model":      "gpt-4-0125-preview",
 	}
+
 	requestBody, err := initializers.JSONMarshal(requestData)
 	if err != nil {
 		return "", fmt.Errorf("Error marshaling request data")
