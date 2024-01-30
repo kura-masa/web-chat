@@ -37,7 +37,7 @@ func OpenAIContextTranslate(c *gin.Context) {
 			question = "B:" + chat.Content + question
 		}
 	}
-	question += chat_history[0].Content + "の目的語が無い場合補完した英文のみを出力して"
+	question += "というチャットの'" + chat_history[0].Content + "'の目的語が無い場合,補完した英文を出力して"
 
 	println("AIに送った質問の内容")
 	println(question)
